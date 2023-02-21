@@ -1,13 +1,15 @@
 from http.client import HTTPResponse
-from django.shortcuts import render, HttpResponse
+
+from django.http import JsonResponse
+from django.shortcuts import HttpResponse, render
+from rest_framework import generics, mixins, status, viewsets
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import APIView, api_view
+from rest_framework.parsers import JSONParser
+from rest_framework.response import Response
+
 from .models import Record
 from .serializers import RecordSerializer
-from django.http import JsonResponse
-from rest_framework.parsers import JSONParser
-from rest_framework.decorators import api_view, APIView
-from rest_framework.response import Response
-from rest_framework import status, generics, mixins, viewsets
-from rest_framework.authentication import TokenAuthentication
 
 
 class RecordViewSet(viewsets.ModelViewSet):
