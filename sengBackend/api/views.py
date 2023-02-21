@@ -7,11 +7,13 @@ from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view, APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, mixins, viewsets
+from rest_framework.authentication import TokenAuthentication
 
 
 class RecordViewSet(viewsets.ModelViewSet):
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
+    authentication_classes = (TokenAuthentication,)
 
 
 # class RecordList(
