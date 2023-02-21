@@ -1,12 +1,11 @@
 from django.urls import path, include
 from numpy import record
-from .views import RecordList, RecordDetails
+from .views import RecordViewSet
+from rest_framework.routers import DefaultRouter
 
-# record_list, record_details
+router = DefaultRouter()
+router.register("records", RecordViewSet, basename="records")
 
 urlpatterns = [
-    path("records", RecordList.as_view()),
-    path("records/<int:id>/", RecordDetails.as_view()),
-    # path("records", record_list),
-    # path("records/<int:pk>/", record_details),
+    path("", include(router.urls)),
 ]
