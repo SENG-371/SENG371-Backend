@@ -1,5 +1,6 @@
 from http.client import HTTPResponse
 
+from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse, render
 from rest_framework import generics, mixins, status, viewsets
@@ -7,7 +8,6 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import APIView, api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from django.contrib.auth.models import User
 
 from .models import Record
 from .serializers import RecordSerializer, UserSerializer
