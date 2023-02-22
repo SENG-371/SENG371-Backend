@@ -7,15 +7,21 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import APIView, api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
+from django.contrib.auth.models import User
 
 from .models import Record
-from .serializers import RecordSerializer
+from .serializers import RecordSerializer, UserSerializer
 
 
 class RecordViewSet(viewsets.ModelViewSet):
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
     authentication_classes = (TokenAuthentication,)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 # class RecordList(
