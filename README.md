@@ -2,23 +2,18 @@
 
 ### Steps:
 
-- install py packages. use `pip install -r requirements.txt`
 
+- clone the project via the https method
 
-
-**Development Guide**
-
-clone the project via the https method
-
-install requirements:
+- install requirements:
 
 `pip install -r requirements.txt`
 
-migrate database:
+- migrate database:
 
 `./manage.py migrate`
 
-run project:
+- run project:
 
 `./manage.py runserver`
 
