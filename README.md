@@ -1,3 +1,4 @@
+![BackEnd](https://github.com/SENG-371/SENG371-Backend/actions/workflows/django.yml/badge.svg)
 # SENG371-Backend
 
 ### Steps:
