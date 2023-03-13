@@ -8,7 +8,7 @@ class TestRecords(unittest.TestCase):
         super().__init__(methodName=methodName)
 
     # Create your tests here.
-    def test_setUp(self):
+    def setUp(self):
         self.record_attributes = {
             "illness": "flu",
             "description": "bad flu!",
