@@ -51,5 +51,4 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        cd sengBackend
-        python manage.py test
+        cd sengBackend && python manage.py test
