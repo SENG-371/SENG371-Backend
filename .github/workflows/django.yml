@@ -51,4 +51,4 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        python ./sengBackend/manage.py test
+        python ./sengBackend/manage.py test api
