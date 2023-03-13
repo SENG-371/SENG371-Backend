@@ -4,6 +4,9 @@ import unittest
 
 
 class TestRecords(unittest.TestCase):
+    def __init__(self, methodName: str) -> None:
+        super().__init__(methodName=methodName)
+
     # Create your tests here.
     def setUp(self):
         self.record_attributes = {
