@@ -1,96 +1,86 @@
-from http.client import HTTPResponse
-
-from django.contrib.auth.models import User
-from django.http import JsonResponse
-from django.shortcuts import HttpResponse, render
-from rest_framework import generics, mixins, status, viewsets
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import APIView, api_view
-from rest_framework.parsers import JSONParser
+from rest_framework import generics
+from .models import User, Record, UserRecord
+from .serializers import (
+    UserSerializer,
+    RecordSerializer,
+    UserRegistrationSerializer,
+    RecordUpdateSerializer,
+)
+from django.contrib.auth import get_user_model
+from rest_framework import generics, status
 from rest_framework.response import Response
-
-from .models import Record
-from .serializers import RecordSerializer, UserSerializer
+from rest_framework.views import APIView
 
 
-class RecordViewSet(viewsets.ModelViewSet):
-    queryset = Record.objects.all()
-    serializer_class = RecordSerializer
-    authentication_classes = (TokenAuthentication,)
-
-
-class UserViewSet(viewsets.ModelViewSet):
+class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
-# class RecordList(
-#     generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin
-# ):
-#     queryset = Record.objects.all()
-#     serializer_class = RecordSerializer
-
-#     def get(self, request):
-#         return self.list(request)
-
-#     def post(self, request):
-#         return self.create(request)
-
-#     # def get(self, request):
-#     #     records = Record.objects.all()
-#     #     serializer = RecordSerializer(records, many=True)
-#     #     return Response(serializer.data)
-
-#     # def post(self, request):
-#     #     serializer = RecordSerializer(data=request.data)
-#     #     if serializer.is_valid():
-#     #         serializer.save()
-#     #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-#     #     return Response(serializer.errors, status=status.HTTP_400_BAD_RESQUEST)
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
-# class RecordDetails(
-#     generics.GenericAPIView,
-#     mixins.RetrieveModelMixin,
-#     mixins.UpdateModelMixin,
-#     mixins.DestroyModelMixin,
-# ):
+class RecordList(generics.ListCreateAPIView):
+    queryset = Record.objects.all()
+    serializer_class = RecordSerializer
 
-#     queryset = Record.objects.all()
-#     serializer_class = RecordSerializer
 
-#     lookup_field = "id"
+class RecordDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Record.objects.all()
+    serializer_class = RecordSerializer
 
-#     def get(self, request, id):
-#         return self.retrieve(request, id=id)
 
-#     def put(self, request, id):
-#         return self.update(request, id=id)
+User = get_user_model()
 
-#     def delete(self, request, id):
-#         return self.destroy(request, id=id)
 
-#     # def get_object(self, id):
-#     #     try:
-#     #         return Record.objects.get(id=id)
+class UserRegistrationView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegistrationSerializer
 
-#     #     except Record.DoesNotExist:
-#     #         return HTTPResponse(status=status.HTTP_404_NOT_FOUND)
 
-#     # def get(self, request, id):
-#     #     record = self.get_object(id)
-#     #     serializer = RecordSerializer(record)
-#     #     return Response(serializer.data)
+class UserRecordsView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
 
-#     # def put(self, request, id):
-#     #     record = self.get_object(id)
-#     #     serializer = RecordSerializer(record, data=request.data)
-#     #     if serializer.is_valid():
-#     #         serializer.save()
-#     #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-#     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_queryset(self):
+        user = self.request.user
+        return User.objects.filter(pk=user.pk)
 
-#     # def delete(self, request, id):
-#     #     record = self.get_object(id)
-#     #     record.delete()
-#     #     return Response(status=status.HTTP_204_NO_CONTENT)
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, *args, **kwargs):
+        user = self.request.user
+        user_records = request.data.get("user_records", [])
+        UserRecord.objects.filter(user=user).delete()
+        for record_id in user_records:
+            record = Record.objects.get(pk=record_id)
+            user_record = UserRecord(user=user, record=record)
+            user_record.save()
+        return Response(
+            {
+                "user": UserSerializer(
+                    user, context=self.get_serializer_context()
+                ).data,
+                "message": "User records updated successfully",
+            }
+        )
+
+
+class RecordUpdateView(APIView):
+    def put(self, request, pk):
+        try:
+            record = Record.objects.get(pk=pk)
+        except Record.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = RecordUpdateSerializer(record, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
