@@ -37,3 +37,15 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class UserRecord(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="user_records"
+    )
+    record = models.ForeignKey(
+        Record, on_delete=models.CASCADE, related_name="user_records_created"
+    )
+
+    class Meta:
+        unique_together = ["user", "record"]
