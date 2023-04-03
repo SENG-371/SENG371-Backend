@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Record, UserRecord
+from .models import CustomUser, Record, UserRecord
 from django.utils import timezone
 
 
@@ -7,7 +7,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     records = serializers.ListField(child=serializers.IntegerField(), required=False)
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = [
             "id",
             "username",
@@ -37,15 +37,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             records.append(record)
 
         user_data = validated_data
-        user = User.objects.create_user(**user_data)
+        user = CustomUser.objects.create_user(**user_data)
         for record in records:
             user_record = UserRecord(user=user, record=record)
             user_record.save()
         return user
-
-
-from rest_framework import serializers
-from .models import Record, User
 
 
 class RecordSerializer(serializers.ModelSerializer):
@@ -83,7 +79,7 @@ class UserSerializer(serializers.ModelSerializer):
     user_records = UserRecordSerializer(many=True, read_only=True)
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = [
             "id",
             "username",
@@ -97,3 +93,9 @@ class UserSerializer(serializers.ModelSerializer):
     def get_records(self, obj):
         user_records = obj.user_records.all()
         return RecordSerializer(user_records.values("record"), many=True).data
+
+
+class UserDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ["username"]

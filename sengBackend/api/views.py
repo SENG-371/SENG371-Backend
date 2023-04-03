@@ -1,24 +1,35 @@
-from rest_framework import generics
-from .models import User, Record, UserRecord
+from rest_framework import generics, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.contrib.auth import get_user_model
+from .models import CustomUser, Record, UserRecord
 from .serializers import (
     UserSerializer,
     RecordSerializer,
     UserRegistrationSerializer,
     RecordUpdateSerializer,
+    UserDeleteSerializer,
 )
-from django.contrib.auth import get_user_model
-from rest_framework import generics, status
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+
+
+class UserDeleteView(APIView):
+    serializer_class = UserDeleteSerializer
+
+    def delete(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserList(generics.ListCreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
 
@@ -32,11 +43,8 @@ class RecordDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RecordSerializer
 
 
-User = get_user_model()
-
-
 class UserRegistrationView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserRegistrationSerializer
 
 
@@ -45,7 +53,7 @@ class UserRecordsView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return User.objects.filter(pk=user.pk)
+        return CustomUser.objects.filter(pk=user.pk)
 
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)

@@ -9,13 +9,13 @@ class Record(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
-    users = models.ManyToManyField("User", related_name="record_users")
+    users = models.ManyToManyField("CustomUser", related_name="record_users")
 
     def __str__(self):
         return self.name
 
 
-class User(AbstractUser):
+class CustomUser(AbstractUser):
     age = models.IntegerField(blank=True, null=True)
     birthday = models.DateField(blank=True, null=True)
     riskLevel = models.CharField(max_length=255, blank=True, null=True)
@@ -41,7 +41,7 @@ class User(AbstractUser):
 
 class UserRecord(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="user_records"
+        CustomUser, on_delete=models.CASCADE, related_name="user_records"
     )
     record = models.ForeignKey(
         Record, on_delete=models.CASCADE, related_name="user_records_created"
