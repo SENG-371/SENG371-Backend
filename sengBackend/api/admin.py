@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Record, UserRecord
+from .models import Patients, Record, PatientRecord
 
 
-class CustomUserAdmin(UserAdmin):
+class PatientsAdmin(UserAdmin):
     list_display = (
         "username",
         "email",
@@ -50,9 +50,9 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ("username", "email", "first_name", "last_name")
 
 
-admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Patients, PatientsAdmin)
 
 
 admin.site.register(Record)
 
-admin.site.register(UserRecord)
+admin.site.register(PatientRecord)

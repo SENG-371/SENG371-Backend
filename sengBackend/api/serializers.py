@@ -1,13 +1,13 @@
 from rest_framework import serializers
-from .models import CustomUser, Record, UserRecord
+from .models import Patients, Record, PatientRecord
 from django.utils import timezone
 
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
+class PatientRegistrationSerializer(serializers.ModelSerializer):
     records = serializers.ListField(child=serializers.IntegerField(), required=False)
 
     class Meta:
-        model = CustomUser
+        model = Patients
         fields = [
             "id",
             "username",
@@ -37,9 +37,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             records.append(record)
 
         user_data = validated_data
-        user = CustomUser.objects.create_user(**user_data)
+        user = Patients.objects.create_user(**user_data)
         for record in records:
-            user_record = UserRecord(user=user, record=record)
+            user_record = PatientRecord(user=user, record=record)
             user_record.save()
         return user
 
@@ -60,12 +60,12 @@ class RecordSerializer(serializers.ModelSerializer):
         return record
 
 
-class UserRecordSerializer(serializers.ModelSerializer):
+class PatientRecordSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     record = serializers.StringRelatedField()
 
     class Meta:
-        model = UserRecord
+        model = PatientRecord
         fields = ["id", "user", "record"]
 
 
@@ -75,11 +75,11 @@ class RecordUpdateSerializer(serializers.ModelSerializer):
         fields = ["name", "description", "illness"]
 
 
-class UserSerializer(serializers.ModelSerializer):
-    user_records = UserRecordSerializer(many=True, read_only=True)
+class PatientSerializer(serializers.ModelSerializer):
+    user_records = PatientRecordSerializer(many=True, read_only=True)
 
     class Meta:
-        model = CustomUser
+        model = Patients
         fields = [
             "id",
             "username",
@@ -95,7 +95,7 @@ class UserSerializer(serializers.ModelSerializer):
         return RecordSerializer(user_records.values("record"), many=True).data
 
 
-class UserDeleteSerializer(serializers.ModelSerializer):
+class PatientDeleteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
+        model = Patients
         fields = ["username"]

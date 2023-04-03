@@ -3,34 +3,37 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
-from .models import CustomUser, Record, UserRecord
+from .models import Patients, Record, PatientRecord
 from .serializers import (
-    UserSerializer,
+    PatientSerializer,
     RecordSerializer,
-    UserRegistrationSerializer,
+    PatientRegistrationSerializer,
     RecordUpdateSerializer,
-    UserDeleteSerializer,
+    PatientDeleteSerializer,
 )
 from django.shortcuts import get_object_or_404
 
 
-class UserDeleteView(APIView):
-    serializer_class = UserDeleteSerializer
+class PatientDeleteView(APIView):
+    serializer_class = PatientDeleteSerializer
 
     def delete(self, request, username):
-        user = get_object_or_404(CustomUser, username=username)
+        user = get_object_or_404(Patients, username=username)
         user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {"message": "Patient deleted successfully"},
+            status=status.HTTP_204_NO_CONTENT,
+        )
 
 
-class UserList(generics.ListCreateAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
+class PatientList(generics.ListCreateAPIView):
+    queryset = Patients.objects.all()
+    serializer_class = PatientSerializer
 
 
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
+class PatientDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Patients.objects.all()
+    serializer_class = PatientSerializer
 
 
 class RecordList(generics.ListCreateAPIView):
@@ -43,20 +46,20 @@ class RecordDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RecordSerializer
 
 
-class UserRegistrationView(generics.CreateAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserRegistrationSerializer
+class PatientRegistrationView(generics.CreateAPIView):
+    queryset = Patients.objects.all()
+    serializer_class = PatientRegistrationSerializer
 
 
-class UserRecordsView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = UserSerializer
+class PatientRecordsView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PatientSerializer
 
     def get_queryset(self):
         user = self.request.user
-        return CustomUser.objects.filter(pk=user.pk)
+        return Patients.objects.filter(pk=user.pk)
 
     def post(self, request):
-        serializer = UserRegistrationSerializer(data=request.data)
+        serializer = PatientRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -65,14 +68,14 @@ class UserRecordsView(generics.RetrieveUpdateDestroyAPIView):
     def patch(self, request, *args, **kwargs):
         user = self.request.user
         user_records = request.data.get("user_records", [])
-        UserRecord.objects.filter(user=user).delete()
+        PatientRecord.objects.filter(user=user).delete()
         for record_id in user_records:
             record = Record.objects.get(pk=record_id)
-            user_record = UserRecord(user=user, record=record)
+            user_record = PatientRecord(user=user, record=record)
             user_record.save()
         return Response(
             {
-                "user": UserSerializer(
+                "user": PatientSerializer(
                     user, context=self.get_serializer_context()
                 ).data,
                 "message": "User records updated successfully",

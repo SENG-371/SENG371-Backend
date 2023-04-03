@@ -9,13 +9,13 @@ class Record(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
-    users = models.ManyToManyField("CustomUser", related_name="record_users")
+    users = models.ManyToManyField("Patients", related_name="record_users")
 
     def __str__(self):
         return self.name
 
 
-class CustomUser(AbstractUser):
+class Patients(AbstractUser):
     age = models.IntegerField(blank=True, null=True)
     birthday = models.DateField(blank=True, null=True)
     riskLevel = models.CharField(max_length=255, blank=True, null=True)
@@ -39,9 +39,9 @@ class CustomUser(AbstractUser):
         return self.username
 
 
-class UserRecord(models.Model):
+class PatientRecord(models.Model):
     user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="user_records"
+        Patients, on_delete=models.CASCADE, related_name="user_records"
     )
     record = models.ForeignKey(
         Record, on_delete=models.CASCADE, related_name="user_records_created"

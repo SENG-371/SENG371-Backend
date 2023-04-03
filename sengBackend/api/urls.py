@@ -1,22 +1,24 @@
 from django.urls import path
 from .views import (
-    UserList,
-    UserDetail,
+    PatientList,
+    PatientDetail,
     RecordList,
     RecordDetail,
-    UserRegistrationView,
-    UserRecordsView,
+    PatientRegistrationView,
+    PatientRecordsView,
     RecordUpdateView,
-    UserDeleteView,
+    PatientDeleteView,
 )
 
 urlpatterns = [
-    path("users/", UserList.as_view()),
-    path("users/<int:pk>/", UserDetail.as_view()),
-    path("users/<int:pk>/records/", UserRecordsView.as_view()),
+    path("users/", PatientList.as_view()),
+    path("users/<int:pk>/", PatientDetail.as_view()),
+    path("users/<int:pk>/records/", PatientRecordsView.as_view()),
     path("records/", RecordList.as_view()),
     path("records/<int:pk>/", RecordDetail.as_view()),
-    path("users/register/", UserRegistrationView.as_view()),
+    path("users/register/", PatientRegistrationView.as_view()),
     path("records/<int:pk>/update/", RecordUpdateView.as_view()),
-    path("users/delete/<str:username>/", UserDeleteView.as_view(), name="user-delete"),
+    path(
+        "users/delete/<str:username>/", PatientDeleteView.as_view(), name="user-delete"
+    ),
 ]
