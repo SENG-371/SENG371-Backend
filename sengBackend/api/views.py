@@ -2,16 +2,27 @@ from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import get_user_model
-from .models import Patients, Record, PatientRecord
+from .models import Patients, Practitioner, Record, PatientRecord
 from .serializers import (
     PatientSerializer,
     RecordSerializer,
     PatientRegistrationSerializer,
     RecordUpdateSerializer,
     PatientDeleteSerializer,
+    PractitionerRegistrationSerializer,
+    PractitionerSerializer,
 )
 from django.shortcuts import get_object_or_404
+
+
+class PractitionerListView(generics.ListAPIView):
+    queryset = Practitioner.objects.all()
+    serializer_class = PractitionerSerializer
+
+
+class PractitionerRegistrationView(generics.CreateAPIView):
+    queryset = Practitioner.objects.all()
+    serializer_class = PractitionerRegistrationSerializer
 
 
 class PatientDeleteView(APIView):

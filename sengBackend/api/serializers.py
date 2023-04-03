@@ -1,10 +1,12 @@
 from rest_framework import serializers
-from .models import Patients, Record, PatientRecord
+from .models import Patients, Record, PatientRecord, Practitioner
 from django.utils import timezone
 
 
 class PatientRegistrationSerializer(serializers.ModelSerializer):
-    records = serializers.ListField(child=serializers.IntegerField(), required=False)
+    practitioners = serializers.ListField(
+        child=serializers.IntegerField(), required=False
+    )
 
     class Meta:
         model = Patients
@@ -16,11 +18,22 @@ class PatientRegistrationSerializer(serializers.ModelSerializer):
             "password",
             "riskLevel",
             "birthday",
-            "records",
+            "practitioners",
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
+        practitioner_ids = validated_data.pop("practitioners", [])
+        practitioners = []
+        for practitioner_id in practitioner_ids:
+            try:
+                practitioner = Practitioner.objects.get(practitioner_id=practitioner_id)
+            except Practitioner.DoesNotExist:
+                raise serializers.ValidationError(
+                    f"Practitioner with id {practitioner_id} does not exist"
+                )
+            practitioners.append(practitioner)
+
         record_ids = validated_data.pop("records", [])
         records = []
         for record_id in record_ids:
@@ -41,6 +54,8 @@ class PatientRegistrationSerializer(serializers.ModelSerializer):
         for record in records:
             user_record = PatientRecord(user=user, record=record)
             user_record.save()
+        for practitioner in practitioners:
+            practitioner.patients.add(user)
         return user
 
 
@@ -99,3 +114,45 @@ class PatientDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patients
         fields = ["username"]
+
+
+class PractitionerSerializer(serializers.ModelSerializer):
+    patients = serializers.PrimaryKeyRelatedField(
+        queryset=Patients.objects.all(), many=True
+    )
+
+    class Meta:
+        model = Practitioner
+        fields = ["practitioner_id", "username", "email", "patients"]
+
+
+class PractitionerRegistrationSerializer(serializers.ModelSerializer):
+    patients = serializers.ListField(child=serializers.IntegerField(), required=False)
+
+    class Meta:
+        model = Practitioner
+        fields = [
+            "practitioner_id",
+            "username",
+            "email",
+            "password",
+            "patients",
+        ]
+        extra_kwargs = {"password": {"write_only": True}}
+
+    def create(self, validated_data):
+        patient_ids = validated_data.pop("patients", [])
+        patients = []
+        for patient_id in patient_ids:
+            try:
+                patient = Patients.objects.get(id=patient_id)
+            except Patients.DoesNotExist:
+                raise serializers.ValidationError(
+                    f"Patient with id {patient_id} does not exist"
+                )
+            patients.append(patient)
+
+        practitioner = Practitioner.objects.create_user(**validated_data)
+        for patient in patients:
+            practitioner.patients.add(patient)
+        return practitioner
