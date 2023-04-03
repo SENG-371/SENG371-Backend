@@ -47,6 +47,11 @@ class PatientDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PatientSerializer
 
 
+class PractitionerDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Practitioner.objects.all()
+    serializer_class = PractitionerSerializer
+
+
 class RecordList(generics.ListCreateAPIView):
     queryset = Record.objects.all()
     serializer_class = RecordSerializer

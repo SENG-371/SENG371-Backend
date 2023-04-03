@@ -10,6 +10,7 @@ from .views import (
     PatientDeleteView,
     PractitionerRegistrationView,
     PractitionerListView,
+    PractitionerDetail,
 )
 
 urlpatterns = [
@@ -25,4 +26,5 @@ urlpatterns = [
     ),
     path("practitioners/", PractitionerListView.as_view(), name="practitioner-list"),
     path("practitioners/register/", PractitionerRegistrationView.as_view()),
+    path("practitioners/<int:pk>/", PractitionerDetail.as_view()),
 ]

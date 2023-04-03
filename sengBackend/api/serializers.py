@@ -118,12 +118,12 @@ class PatientDeleteSerializer(serializers.ModelSerializer):
 
 class PractitionerSerializer(serializers.ModelSerializer):
     patients = serializers.PrimaryKeyRelatedField(
-        queryset=Patients.objects.all(), many=True
+        queryset=Practitioner.objects.all(), many=True
     )
 
     class Meta:
         model = Practitioner
-        fields = ["practitioner_id", "username", "email", "patients"]
+        fields = ["id", "practitioner_id", "username", "email", "patients"]
 
 
 class PractitionerRegistrationSerializer(serializers.ModelSerializer):
