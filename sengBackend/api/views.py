@@ -11,6 +11,7 @@ from .serializers import (
     PatientDeleteSerializer,
     PractitionerRegistrationSerializer,
     PractitionerSerializer,
+    PractitionerDeleteSerializer,
 )
 from django.shortcuts import get_object_or_404
 
@@ -23,6 +24,18 @@ class PractitionerListView(generics.ListAPIView):
 class PractitionerRegistrationView(generics.CreateAPIView):
     queryset = Practitioner.objects.all()
     serializer_class = PractitionerRegistrationSerializer
+
+
+class PractitionerDeleteView(APIView):
+    serializer_class = PractitionerDeleteSerializer
+
+    def delete(self, request, username):
+        user = get_object_or_404(Practitioner, username=username)
+        user.delete()
+        return Response(
+            {"message": "Patient deleted successfully"},
+            status=status.HTTP_204_NO_CONTENT,
+        )
 
 
 class PatientDeleteView(APIView):

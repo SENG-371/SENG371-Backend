@@ -116,6 +116,12 @@ class PatientDeleteSerializer(serializers.ModelSerializer):
         fields = ["username"]
 
 
+class PractitionerDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Practitioner
+        fields = ["username"]
+
+
 class PractitionerSerializer(serializers.ModelSerializer):
     patients = PatientSerializer(many=True)
 

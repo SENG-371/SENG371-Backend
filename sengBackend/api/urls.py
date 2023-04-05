@@ -11,6 +11,7 @@ from .views import (
     PractitionerRegistrationView,
     PractitionerListView,
     PractitionerDetail,
+    PractitionerDeleteView,
 )
 
 urlpatterns = [
@@ -27,4 +28,9 @@ urlpatterns = [
     path("practitioners/", PractitionerListView.as_view(), name="practitioner-list"),
     path("practitioners/register/", PractitionerRegistrationView.as_view()),
     path("practitioners/<int:pk>/", PractitionerDetail.as_view()),
+    path(
+        "practitioner/delete/<str:username>/",
+        PractitionerDeleteView.as_view(),
+        name="practitioner-delete",
+    ),
 ]
