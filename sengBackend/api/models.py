@@ -40,6 +40,10 @@ class Patients(AbstractUser):
     def __str__(self):
         return self.username
 
+    class Meta:
+        verbose_name = "Patient"
+        verbose_name_plural = "Patients"
+
 
 class PatientRecord(models.Model):
     user = models.ForeignKey(
@@ -91,3 +95,7 @@ class Practitioner(AbstractUser):
 
     def __str__(self):
         return self.practitioner_id
+
+    class Meta:
+        verbose_name = "Practitioner"
+        verbose_name_plural = "Practitioners"
