@@ -12,9 +12,12 @@ from .views import (
     PractitionerListView,
     PractitionerDetail,
     PractitionerDeleteView,
+    LoginView,
 )
 
 urlpatterns = [
+    #login
+    path("login/", LoginView.as_view()),
     path("users/", PatientList.as_view()),
     path("users/<int:pk>/", PatientDetail.as_view()),
     path("users/<int:pk>/records/", PatientRecordsView.as_view()),
